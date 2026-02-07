@@ -15,29 +15,17 @@ This solver utilizes an information-reduction strategy. It does not simply guess
 
 How it works:
 
-Initialization: The solver starts with the optimal first guess: roate (pre-calculated to save runtime).
-
-Feedback Loop: It submits a guess and processes the result (e.g., matching characters, wrong positions).
-
-Pruning: It filters the list of Valid Solutions to keep only those that match the feedback history.
-
-Selection: It analyzes the remaining possibilities and selects the next guess that will narrow down the list the fastest.
+Finds the word that will split each possible answer into the most buckets possible.
+Repeat for each bucket till every bucket has only one answer.
 
 ## 📉 Performance
 Running against the standard Wordle answer set, the current algorithm achieves:
 
-Average Guesses: 4.08
+Average Guesses: 3.43
 
-Success Rate: 99.8% (Solves within 6 guesses)
+Success Rate: 100% (Solves within 6 guesses)
 
-Speed Optimization: The initial state calculation is cached, making the first move instant.
-
-## 🔮 Future Roadmap
-This project is currently in Phase 1 (Greedy Strategy). Planned improvements for Phase 2 include:
-
-Breadth-First Search (BFS): Moving away from greedy local optimization to a BFS approach to find globally optimal paths.
-
-Decision Tree Integration: Implementing a lookahead system. This will include the rest of the decision tree in each guess—specifically, if an answer is on another branch of the tree, it will be ignored from the current guess calculation even if the current branch hasn't strictly excluded it yet.
+Speed Optimization: Takes 1 minute.
 
 ## 📋 Prerequisites
 Python 3.x
@@ -60,7 +48,6 @@ Run the solver script from your terminal:
 
 python solver.py
 ```
-Note: Depending on how your script is set up, you might want to add instructions here on whether it plays automatically or asks the user to input the colors/feedback.
 
 ## ❤️ Support
 If you found this tool useful, consider checking out my Patreon.
