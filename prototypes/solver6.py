@@ -1,3 +1,4 @@
+from math import log
 import re
 import sys
 import argparse
@@ -37,16 +38,24 @@ def get_word_score_for_answer(guess: str, answer: str) -> str:
     return ''.join(result)
 
 def get_bucket_count(guess : str, possible_answers : list[str]):
-    results = set([])
+    results = dict[str, int]()
 
     for answer in possible_answers:
-        results.add(get_word_score_for_answer(guess, answer))
+        score = get_word_score_for_answer(guess, answer)
+        if score not in results:
+            results[score] = 0
+        results[score] += 1
+    
+    score = 0.0
+
+    for result in results.keys():
+        score += 1 / (log(results[result]) + 0.1)
 
     if guess in possible_answers:
-        return (len(results) + 0.5, guess)
+        score += 1
     
     #print(f"Bucket count for {guess} = {len(results)}")
-    return (len(results), guess)
+    return (score, guess)
 
 def get_best_guess(possible_guesses : list[str], possible_answers : list[str]) -> str:
     if len(possible_answers) == 0:

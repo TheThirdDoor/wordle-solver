@@ -37,18 +37,28 @@ def get_word_score_for_answer(guess: str, answer: str) -> str:
     return ''.join(result)
 
 def get_bucket_count(guess : str, possible_answers : list[str]):
-    results = set([])
+    results = dict[str, int]()
 
     for answer in possible_answers:
-        results.add(get_word_score_for_answer(guess, answer))
+        score = get_word_score_for_answer(guess, answer)
+        if score not in results:
+            results[score] = 0
+        results[score] += 1
+
+    score = 0
+
+    for count in results.values():
+        if count == 1:
+            continue
+        score += count * count
 
     if guess in possible_answers:
-        return (len(results) + 0.5, guess)
-    
-    #print(f"Bucket count for {guess} = {len(results)}")
-    return (len(results), guess)
+        score -= 1
 
-def get_best_guess(possible_guesses : list[str], possible_answers : list[str]) -> str:
+    #print(f"Bucket count for {guess} = {len(results)}")
+    return (score, guess)
+
+def get_best_guess(possible_answers : list[str]) -> str:
     if len(possible_answers) == 0:
         print("No possible answers")
         exit()
@@ -59,10 +69,10 @@ def get_best_guess(possible_guesses : list[str], possible_answers : list[str]) -
     worker_func = partial(get_bucket_count, possible_answers=possible_answers)
 
     with multiprocessing.Pool(processes = 8) as pool:
-        results = pool.map(worker_func, possible_guesses)
+        results = pool.map(worker_func, all_words)
 
-    # Find the guess with the maximum bucket count
-    bucket_count, best_guess = max(results)
+    # Find the guess with the minimum bucket count
+    bucket_count, best_guess = min(results)
     return best_guess
 
 def check_answers_against_guess(guess: str, possible_answers: list[str]) -> dict[str, list[str]]:
@@ -83,7 +93,7 @@ def recursive_check():
 
     for d in range(maxdepth):
         for group in layers[d].keys():
-            best_guess = get_best_guess(all_words, layers[d][group])
+            best_guess = get_best_guess(layers[d][group])
             next_layer = check_answers_against_guess(best_guess, layers[d][group])
             for result in next_layer.keys():
                 if result == "GGGGG":
